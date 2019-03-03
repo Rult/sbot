@@ -152,9 +152,9 @@ client.on('ready', () => {
 	});
 
 	// кэширование реакций кинотеатра
-	/*client.channels.get("541594001992581122").fetchMessage("542389154424553549")
+	client.channels.get("541594001992581122").fetchMessage("542389154424553549")
 		.then(() => {})
-		.catch(error => console.log(error));*/
+		.catch(error => console.log(error));
 
 });
 client.on('message', msg => {
