@@ -126,8 +126,8 @@ function processMessage(msg) {
 	s.autoreact(msg, args, true);
 }
 function actionsForReactions(messageReaction, user) {
-	let msg = messageReaction.message;
-	let msgReaction = messageReaction.emoji.name;
+	const msg = messageReaction.message;
+	const msgReaction = messageReaction.emoji.name;
 
 	if (msgReaction == "📽" && msg.id == "542389154424553549") {
 		s.setCinemaRole(user, false);
