@@ -17,7 +17,7 @@ export const dateOptions = {
 	timeZone: "Europe/Moscow"
 };
 export const ownerID = "172075054912372737";
-export const botID = "343848758259482624";
+export let botID;
 
 import * as s from "./secondary";
 import * as c from "./commands";
@@ -125,6 +125,18 @@ function processMessage(msg) {
 	args.unshift(cmd);
 	s.autoreact(msg, args, true);
 }
+function actionsForReactions(messageReaction, user) {
+	let msg = messageReaction.message;
+	let msgReaction = messageReaction.emoji.name;
+
+	if (msgReaction == "📽" && msg.id == "542389154424553549") {
+		s.setCinemaRole(user, false);
+	} else if (msg.content.startsWith("Доступные эмоджи:") && ["⬅", "➡"].includes(msgReaction)) {
+		s.checkEmojiListReaction(msgReaction, user, msg, serverArray)
+	} else {
+		s.checkHomestuckReaction(messageReaction, user);
+	}
+}
 
 // действия непосредственно после запуска бота
 client.on('ready', () => {
@@ -133,7 +145,7 @@ client.on('ready', () => {
 	console.log(client.user.tag + " entered Discord on " + readyTimeString);
 
 	client.user.setPresence({game: {name: "sb help", type: 0}});
-	// botID = client.user.id;
+	botID = client.user.id;
 
 	// кэширование сообщений для реакций и сбор айдишников серверов
 	client.guilds.forEach(guild => {
@@ -171,26 +183,12 @@ client.on('messageReactionAdd', (messageReaction, user) => {
 		if (msg.channel.id != "526441608250392577") {
 			msg.delete(300);
 		}
-	} else if (msgReaction == "📽" && msg.id == "542389154424553549") {
-		s.setCinemaRole(user, true);
-	} else if (msg.content.startsWith("Доступные эмоджи:") && ["⬅", "➡"].includes(msgReaction)) {
-		s.checkEmojiListReaction(msgReaction, user, msg, serverArray)
 	} else {
-		s.checkHomestuckReaction(messageReaction, user);
+		actionsForReactions(messageReaction, user);
 	}
 });
 client.on('messageReactionRemove', (messageReaction, user) => {
-	const msg = messageReaction.message;
-	const msgReaction = messageReaction.emoji.name;
-
-	if (msgReaction == "📽" && msg.id == "542389154424553549") {
-		s.setCinemaRole(user, false);
-	} else if (msg.content.startsWith("Доступные эмоджи:") && ["⬅", "➡"].includes(msgReaction)) {
-		s.checkEmojiListReaction(msgReaction, user, msg, serverArray)
-	} else {
-		s.checkHomestuckReaction(messageReaction, user);
-	}
-
+	actionsForReactions(messageReaction, user);
 });
 client.on('guildCreate', (guild) => {
 	serverArray.push(guild.id);
