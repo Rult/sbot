@@ -49,12 +49,12 @@ export function Help(msg) {
 	msg.channel.send({embed: helpEmbed});
 }
 export function Ping(msg) {
-	let pongText = "🏓 Понг!";
+	const pongText = "🏓 Понг!";
 	msg.channel.send(pongText)
 		.then((pong) => {
-			let userTime = msg.createdTimestamp / 1000;
-			let botTime = pong.createdTimestamp / 1000;
-			let pongTime = (botTime - userTime).toFixed(3);
+			const userTime = msg.createdTimestamp / 1000;
+			const botTime = pong.createdTimestamp / 1000;
+			const pongTime = (botTime - userTime).toFixed(3);
 			pong.edit(pongText + " " + pongTime + " сек.");
 		})
 		.catch(error => console.log(error));
@@ -66,7 +66,7 @@ export function Img(msg, args) {
 		return;
 	}
 
-	let typeOfImage = ".png";
+	const typeOfImage = ".png";
 
 	for (let i = 0; i < args.length; i++) {
 		for (let key in translatedTags) {
@@ -93,11 +93,11 @@ export function Img(msg, args) {
 		argsText = "?tags=" + encodeURIComponent(argsText);
 	}
 
-	let xhrImg = new XMLHttpRequest();
+	const xhrImg = new XMLHttpRequest();
 	xhrImg.open('GET', 'https://chaoscraft.ml/files/gallery/random/' + argsText);
 	xhrImg.onreadystatechange = function () {
 		if (this.readyState == 4 && this.status == 200) {
-			let imageInfo = JSON.parse(this.responseText);
+			const imageInfo = JSON.parse(this.responseText);
 			if (!imageInfo.error) {
 				msg.channel.send({
 					embed: {
@@ -140,7 +140,7 @@ export function Send(msg, args, msgCommandOriginal, discordLink, imageID, imageD
 	if (!imageID) imageID = "";
 	if (!imageDate) imageDate = "";
 
-	let imageParamsArray = msgCommandOriginal.match(/\S+ (\S+) ([\s\S]+)/);
+	const imageParamsArray = msgCommandOriginal.match(/\S+ (\S+) ([\s\S]+)/);
 
 	if (!imageParamsArray) {
 		msg.react("📜");
@@ -148,12 +148,12 @@ export function Send(msg, args, msgCommandOriginal, discordLink, imageID, imageD
 		return;
 	}
 
-	let imageLink = imageParamsArray[1];
+	const imageLink = imageParamsArray[1];
 
-	let tagsSplit = imageParamsArray[2].split(/(?:tags|т[еаэ]ги):/i, 2);
-	let imageTitle = tagsSplit[0].replace(/\s+$/g, "");
+	const tagsSplit = imageParamsArray[2].split(/(?:tags|т[еаэ]ги):/i, 2);
+	const imageTitle = tagsSplit[0].replace(/\s+$/g, "");
 
-	let imageTags = [];
+	const imageTags = [];
 	if (tagsSplit[1]) {
 		imageTags = tagsSplit[1].toLowerCase().replace(/^\s+/g, "").split(/[,;\s]+/);
 	}
@@ -166,7 +166,7 @@ export function Send(msg, args, msgCommandOriginal, discordLink, imageID, imageD
 		imageTagsText = imageTagsText.slice(0, -2);
 	}
 
-	let imageJSON = '```json\n\t"' + imageID + '": {\n\t\t"title": "' + imageTitle + '",\n\t\t"date": "' + imageDate + '",\n\t\t"takenBy": "' + msg.author.username + '",\n\t\t"big": true,\n\t\t"tags": ['+ imageTagsText +']\n\t},\n```';
+	const imageJSON = '```json\n\t"' + imageID + '": {\n\t\t"title": "' + imageTitle + '",\n\t\t"date": "' + imageDate + '",\n\t\t"takenBy": "' + msg.author.username + '",\n\t\t"big": true,\n\t\t"tags": ['+ imageTagsText +']\n\t},\n```';
 
 	client.channels.get("526441608250392577").send("От " + msg.author.tag + ":\n" + "<" + discordLink + ">\n" + imageLink + "\n" + imageJSON)
 		.then(() => {
@@ -179,7 +179,7 @@ export function React(msg, args) {
 }
 export function EmojiList(msg, args, msgCommandOriginal, usedArrowButton, serverArray) {
 	let fromWhichServer = "343851676404547585";
-	let askedServer = s.getGuild(args[0]);
+	const askedServer = s.getGuild(args[0]);
 
 	let goRight = false;
 	let goLeft = false;
@@ -192,8 +192,8 @@ export function EmojiList(msg, args, msgCommandOriginal, usedArrowButton, server
 	}
 
 	if (usedArrowButton && msg.content.match(/\d{17,20}/g)) {
-		let prevServer = msg.content.match(/\d{17,20}/g)[0];
-		let p = serverArray.indexOf(prevServer);
+		const prevServer = msg.content.match(/\d{17,20}/g)[0];
+		const p = serverArray.indexOf(prevServer);
 		if (p > -1) {
 			let n;
 			if (goRight) {
@@ -211,9 +211,9 @@ export function EmojiList(msg, args, msgCommandOriginal, usedArrowButton, server
 		}
 	}
 
-	let emServ = client.guilds.get(fromWhichServer);
+	const emServ = client.guilds.get(fromWhichServer);
 	if (emServ && emServ.emojis.size) {
-		let embed = {
+		const embed = {
 			color: 0xD4A940,
 			fields: [
 				{
@@ -225,23 +225,23 @@ export function EmojiList(msg, args, msgCommandOriginal, usedArrowButton, server
 
 		let i = 0;
 		let f = 0;
-		let emojiDesc = "Доступные эмоджи:\n" + emServ.name + " `" + emServ.id + "`";
+		const emojiDesc = "Доступные эмоджи:\n" + emServ.name + " `" + emServ.id + "`";
 		let emojiList = [];
 
 		let fieldStart = 1;
 
 		emServ.emojis.forEach(key => {
 			let prefix = "<:";
-			let postfix = ">" + " `" + key.name + "`";
+			const postfix = ">" + " `" + key.name + "`";
 			if (key.animated) {
 				prefix = "<a:";
 			}
 			if (++i % 10 == 1) {
 				prefix = "\n" + prefix
 			}
-			let emojiInfo = prefix + key.name + ":" + key.id + postfix;
+			const emojiInfo = prefix + key.name + ":" + key.id + postfix;
 			emojiList.push(emojiInfo);
-			let emListText = emojiList.join(" ");
+			const emListText = emojiList.join(" ");
 
 			if (f >= 6) {
 				return;
@@ -331,7 +331,7 @@ export function Servers(msg) {
 	if (msg.author.id != ownerID) {
 		return;
 	}
-	let embed = {
+	const embed = {
 		color: 0x888888,
 		description: "```"
 	}
@@ -380,22 +380,22 @@ export function Invite(msg) {
 }
 export function Uptime(msg) {
 
-	let diff = Date.now() - readyTime;
-	let tarr = [1000, 60, 60, 24];
+	const diff = Date.now() - readyTime;
+	const tarr = [1000, 60, 60, 24];
 	for (let i in tarr) {
-		let x = tarr[i];
+		const x = tarr[i];
 		tarr[i] = diff % x;
 		diff = (diff - tarr[i]) / x;
 	}
 	tarr.push(diff);
 	tarr.shift();
-	let warr = [
+	const warr = [
 		['секунду', 'секунды', 'секунд'],
 		['минуту', 'минуты', 'минут'],
 		['час', 'часа', 'часов'],
 		['день', 'дня', 'дней'],
 	];
-	let sarr = [];
+	const sarr = [];
 	for (let i = tarr.length - 1; i >= 0; i--) {
 		if (!tarr[i]) {
 			continue;
@@ -423,12 +423,12 @@ export function Homestuck(msg, args, msgCommandOriginal, usedArrowButton) {
 		page_number = 1;
 	}
 
-	let page_link = 'https://www.homestuck.com/story/' + page_number;
-  let comic_title_empty = "hs#" + page_number;
+	const page_link = 'https://www.homestuck.com/story/' + page_number;
+  const comic_title_empty = "hs#" + page_number;
   let got_error_already = false;
-	let embed_color = 0x249E28;
+	const embed_color = 0x249E28;
 
-	let comic_embed = {
+	const comic_embed = {
 		color: embed_color,
 		author: {
 			url: page_link,
@@ -436,16 +436,16 @@ export function Homestuck(msg, args, msgCommandOriginal, usedArrowButton) {
 		}
 	}
 
-  let xhrHS = new XMLHttpRequest();
+  const xhrHS = new XMLHttpRequest();
   xhrHS.open('GET', page_link);
   xhrHS.setRequestHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0");
 
   xhrHS.onreadystatechange = function () {
     if (this.readyState == 4 && this.status == 200) {
-      let $ = Cheerio.load(this.responseText);
+      const $ = Cheerio.load(this.responseText);
 
-      let content_container = $('div#content_container');
-      let flash_div = $('div#o_flash-container');
+      const content_container = $('div#content_container');
+      const flash_div = $('div#o_flash-container');
 
 
       // detecting video
@@ -454,12 +454,12 @@ export function Homestuck(msg, args, msgCommandOriginal, usedArrowButton) {
       let yt_link_code;
 
       if (flash_div.length) {
-        let yt_raw = flash_div.html().match(/\'youtubeid\', \'(.+)\'/);
+        const yt_raw = flash_div.html().match(/\'youtubeid\', \'(.+)\'/);
         if (yt_raw) {
           yt_link_code = yt_raw[1];
         }
       } else {
-        let yt_raw = $('iframe.ar-inner').attr('src');
+        const yt_raw = $('iframe.ar-inner').attr('src');
         if (yt_raw) {
           yt_link_code = yt_raw.match(/embed\/(.+)/)[1];
         }
@@ -486,7 +486,7 @@ export function Homestuck(msg, args, msgCommandOriginal, usedArrowButton) {
 
 	      // getting description
 	      let desc = $('p.type-rg').text().replace(/\ +/g, " ").replace(/^\s+/, "").replace(/\s+$/, "");
-	      let desc_limit = 2047;
+	      const desc_limit = 2047;
 	      if (desc.length > desc_limit) {
 	        desc = desc.substring(0, desc_limit) + "…";
 	      } else if (desc.length == 0) {
@@ -501,7 +501,7 @@ export function Homestuck(msg, args, msgCommandOriginal, usedArrowButton) {
         if (content_container.length) {
           imgs = content_container.find('img.mar-x-auto.disp-bl');
           if (!imgs.length) {
-            let imgs_raw = $('div.bg-scratch-mid-green.pad-t-lg').find('img');
+            const imgs_raw = $('div.bg-scratch-mid-green.pad-t-lg').find('img');
             if (imgs_raw.length) {
               imgs = imgs_raw.attr('src');
               is_img_from_flash = true;
@@ -511,7 +511,7 @@ export function Homestuck(msg, args, msgCommandOriginal, usedArrowButton) {
           imgs = $('img.mar-x-auto.disp-bl');
         }
         if (flash_div.length && !imgs.length) {
-          let imgs_raw = flash_div.html().match(/\'altimgsrc\', \'(.+)\'/);
+          const imgs_raw = flash_div.html().match(/\'altimgsrc\', \'(.+)\'/);
           if (imgs_raw) {
             imgs = imgs_raw[1];
             is_img_from_flash = true;
@@ -567,7 +567,7 @@ export function SnowflakeTime(msg, args) {
 	let totalSFTimes = "";
 	args.forEach(arg => {
 		if (arg.match(/\d{17,20}/)) {
-			let totalMatches = arg.match(/\d{17,20}/g);
+			const totalMatches = arg.match(/\d{17,20}/g);
 			for (let i in totalMatches) {
 				totalSFTimes += s.dateStr(s.sfTime(Number(totalMatches[i]))) + "\n";
 			}

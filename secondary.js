@@ -16,7 +16,7 @@ export function getSimpleString(str) {
 }
 export function pluralize(n, arr) {
 	// by PLAYER_CHAR
-	let k = n % 10;
+	const k = n % 10;
 	return arr[(n - k) / 10 % 10 != 1 ? (k != 1 ? ([2, 3, 4].includes(k) ? 1 : 2) : 0) : 2];
 }
 export function envelope(msg) {
@@ -61,7 +61,7 @@ export function getStorage(emojiName, guildName, channel) {
 			if (guildName == getSimpleString(key.name)) {
 				guildIdFull = key.id;
 			} else if (getSimpleString(key.name).match(new RegExp("^(" + escapeRegExp(guildName) + ")"))) {
-				let currentGuildId = key.id;
+				const currentGuildId = key.id;
 				client.guilds.get(key.id).emojis.forEach(key => {
 					if (key.name.toLowerCase().match(new RegExp("^(" + escapeRegExp(emojiName) + ")"))) {
 						guildId = currentGuildId;
@@ -88,7 +88,7 @@ export function findEmoji(emojiName, guildName, channel) {
 		}
 	}
 
-	let storage = getStorage(emojiName, guildName, channel);
+	const storage = getStorage(emojiName, guildName, channel);
 
 	if (!storage) {
 		return;
@@ -121,7 +121,7 @@ export function findUserToGetAvatar(username) {
 	}
 
 	// проверка на призывалку
-	let usernameId = username.match(/<@\!?(\d+)>/);
+	const usernameId = username.match(/<@\!?(\d+)>/);
 	if (usernameId) {
 		if (client.users.get(usernameId[1])) {
 			return client.users.get(usernameId[1]);
@@ -169,7 +169,7 @@ export function autoreact(msg, args, isCommandCanBeAnEmoji) {
 
 	let emojiName;
 	let guildName;
-	let messageId = args[1];
+	const messageId = args[1];
 
 	let guildCheck;
 
@@ -183,7 +183,7 @@ export function autoreact(msg, args, isCommandCanBeAnEmoji) {
 	}
 
 	if (messageId) {
-		let emoji = findEmoji(emojiName, guildName, msg.channel);
+		const emoji = findEmoji(emojiName, guildName, msg.channel);
 
 		if (!emoji) {
 			if (isCommandCanBeAnEmoji) {
@@ -202,7 +202,7 @@ export function autoreact(msg, args, isCommandCanBeAnEmoji) {
 					.then(messageToReact => {
 						messageToReact.react(emoji);
 						msg.react("⏳");
-						let removeReactionTimeout = setTimeout(() => messageToReact.reactions.get(emoji.name + ":" + emoji.id).remove(client.user), 25000);
+						const removeReactionTimeout = setTimeout(() => messageToReact.reactions.get(emoji.name + ":" + emoji.id).remove(client.user), 25000);
 						messageToReact.awaitReactions((reaction, user) => {
 							if (user.id == msg.author.id && reaction.emoji.id == emoji.id) {
 								messageToReact.reactions.get(emoji.name + ":" + emoji.id).remove(client.user);
@@ -238,7 +238,7 @@ export function autoreact(msg, args, isCommandCanBeAnEmoji) {
 }
 export function deleteUserMessage(msg) {
 	if (msg.channel.type == "text") { // если бот не начал "беседовать" с юзером
-		let bot_permissions = msg.channel.permissionsFor(client.user);
+		const bot_permissions = msg.channel.permissionsFor(client.user);
 		if (bot_permissions.has("MANAGE_MESSAGES")) {
 			msg.delete(10000)
 				.then(() => {})
@@ -254,12 +254,12 @@ export function sendEmojiLinkEmbed(msg, emoji) {
 	}
 }
 export function sendUserAvatarEmbed(msg, user) {
-	let avaTemp = user.avatarURL;
+	const avaTemp = user.avatarURL;
 	// console.log(avaTemp);
-	let avaTempRE = avaTemp.match(/^((?:.*)\.(\w+))/);
+	const avaTempRE = avaTemp.match(/^((?:.*)\.(\w+))/);
 
-	let isAvaGif = (avaTempRE[2] == "gif") ? true : false;
-	let avatarURLFixed = isAvaGif ? avaTemp + "?size=2048" : avaTemp;
+	const isAvaGif = (avaTempRE[2] == "gif") ? true : false;
+	const avatarURLFixed = isAvaGif ? avaTemp + "?size=2048" : avaTemp;
 
 	msg.channel.send({embed: {title: "Avatar", description: user.tag, image: {url: avatarURLFixed}}});
 	// msg.channel.send({embed: {title: "Avatar", description: user.tag, image: {url: avaTemp}}});
@@ -276,7 +276,7 @@ export function isThisBotsChannel(msg) {
 	}
 }
 export function showHomestuckPage(msg, comic_embed, usedArrowButton, contentText) {
-	let embed = {embed: comic_embed};
+	const embed = {embed: comic_embed};
 	if (usedArrowButton) {
 		if (contentText) {
 			msg.edit(contentText, embed);
@@ -284,7 +284,7 @@ export function showHomestuckPage(msg, comic_embed, usedArrowButton, contentText
 			msg.edit(embed);
 		}
 	} else {
-		let contentToSend = (contentText) ? contentText : embed;
+		const contentToSend = (contentText) ? contentText : embed;
 		msg.channel.send(contentToSend)
 			.then((msg) => {
 				msg.react("⬅")
@@ -297,11 +297,10 @@ export function showHomestuckPage(msg, comic_embed, usedArrowButton, contentText
 	}
 }
 export function checkHomestuckReaction(messageReaction, user) {
-	let msg = messageReaction.message;
-	let msgReaction = messageReaction.emoji.name;
+	const msg = messageReaction.message;
+	const msgReaction = messageReaction.emoji.name;
 
 	if (["⬅", "➡"].includes(msgReaction) && msg.author.id == botID && user.id != botID) {
-		let msg = messageReaction.message;
 		let cMatch, eMatch, page_number;
 		if (cMatch = msg.content.match(/hs#(\d+)/)) {
 			page_number = Number(cMatch[1]);
@@ -348,8 +347,8 @@ export function dateStr(d) {
 }
 export function checkReactionForAutoreact(messageReaction, user) {
 	if (whoNeedsToReactToSomething[user.id]) {
-		let currentUser = client.users.get(user.id);
-		let currentEmoji = findEmoji(whoNeedsToReactToSomething[user.id], whichGuildThisUserMeans[user.id]);
+		const currentUser = client.users.get(user.id);
+		const currentEmoji = findEmoji(whoNeedsToReactToSomething[user.id], whichGuildThisUserMeans[user.id]);
 
 		messageReaction.message.react(currentEmoji);
 		clearTimeout(timeoutForAutoReact);
@@ -357,7 +356,7 @@ export function checkReactionForAutoreact(messageReaction, user) {
 		delete whoNeedsToReactToSomething[user.id];
 		delete whichGuildThisUserMeans[user.id];
 
-		let timerForDeletingAutoReaction = setTimeout(() => {
+		const timerForDeletingAutoReaction = setTimeout(() => {
 			messageReaction.message.reactions.get(currentEmoji.name + ":" + currentEmoji.id).remove(client.user);
 		}, 25000);
 

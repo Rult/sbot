@@ -33,15 +33,15 @@ function processMessage(msg) {
 	// если юзер отправил в лс картинку-аттачмент
 	if (msg.channel.type == "dm") {
 		msg.attachments.forEach(att => {
-			let xhrImgur = new XMLHttpRequest();
+			const xhrImgur = new XMLHttpRequest();
 			xhrImgur.open("POST", "https://api.imgur.com/3/image");
 			xhrImgur.setRequestHeader("Authorization", "Client-ID 734f878d1bebba9");
 			xhrImgur.onload = function() {
-				let imgurData = JSON.parse(xhrImgur.responseText).data;
+				const imgurData = JSON.parse(xhrImgur.responseText).data;
 				if (!imgurData.error) {
 					if (msg.content) {
-						let ogURLParts = att.url.split("/");
-						let ogImgName = ogURLParts[ogURLParts.length - 1];
+						const ogURLParts = att.url.split("/");
+						const ogImgName = ogURLParts[ogURLParts.length - 1];
 						let imageDate = "";
 						if (ogImgName.match(/\d{4}-\d{2}-\d{2}/)) {
 							imageDate = ogImgName.match(/\d{4}-\d{2}-\d{2}/)[0];
@@ -65,8 +65,8 @@ function processMessage(msg) {
 	}
 
 	// обработка сообщения
-	let msgoc = msg.content.replace(/\n/g, " ").replace(/ +/g, " ");
-	let msglc = msgoc.toLowerCase().replace(/ё/g, "е");
+	const msgoc = msg.content.replace(/\n/g, " ").replace(/ +/g, " ");
+	const msglc = msgoc.toLowerCase().replace(/ё/g, "е");
 	let msgCommandOriginal;
 	let msgCommand;
 	let msglcDivided;
@@ -98,8 +98,8 @@ function processMessage(msg) {
 	console.log((new Date).toLocaleString("ru", dateOptions) + "\nFrom " + serverWhereUserIs + ":\n" + msg.author.id + " | " + msg.author.tag + ": " + msg.content);
 
 	// поделить запрос на "основную команду" и аргументы
-	let args = msgCommand.split(" ");
-	let cmd = args.shift();
+	const args = msgCommand.split(" ");
+	const cmd = args.shift();
 
 	// ищем команду в регулярках
 	for (let i of commandsRegExp) {
@@ -129,7 +129,7 @@ function processMessage(msg) {
 // действия непосредственно после запуска бота
 client.on('ready', () => {
 
-	let readyTimeString = new Date(readyTime).toLocaleString("ru", dateOptions);
+	const readyTimeString = new Date(readyTime).toLocaleString("ru", dateOptions);
 	console.log(client.user.tag + " entered Discord on " + readyTimeString);
 
 	client.user.setPresence({game: {name: "sb help", type: 0}});
@@ -162,8 +162,8 @@ client.on('message', msg => {
 	setTimeout(processMessage, 100, msg);
 });
 client.on('messageReactionAdd', (messageReaction, user) => {
-	let msg = messageReaction.message;
-	let msgReaction = messageReaction.emoji.name;
+	const msg = messageReaction.message;
+	const msgReaction = messageReaction.emoji.name;
 
 	if (s.checkReactionForAutoreact(messageReaction, user)) {
 		return;
@@ -180,8 +180,8 @@ client.on('messageReactionAdd', (messageReaction, user) => {
 	}
 });
 client.on('messageReactionRemove', (messageReaction, user) => {
-	let msg = messageReaction.message;
-	let msgReaction = messageReaction.emoji.name;
+	const msg = messageReaction.message;
+	const msgReaction = messageReaction.emoji.name;
 
 	if (msgReaction == "📽" && msg.id == "542389154424553549") {
 		s.setCinemaRole(user, false);
@@ -196,7 +196,7 @@ client.on('guildCreate', (guild) => {
 	serverArray.push(guild.id);
 });
 client.on('guildDelete', (guild) => {
-	let index = serverArray.indexOf(guild.id);
+	const index = serverArray.indexOf(guild.id);
 	if (index) {
 		serverArray.splice(index, 1);
 	}
