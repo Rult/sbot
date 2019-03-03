@@ -153,7 +153,7 @@ export function Send(msg, args, msgCommandOriginal, discordLink, imageID, imageD
 	const tagsSplit = imageParamsArray[2].split(/(?:tags|т[еаэ]ги):/i, 2);
 	const imageTitle = tagsSplit[0].replace(/\s+$/g, "");
 
-	const imageTags = [];
+	let imageTags = [];
 	if (tagsSplit[1]) {
 		imageTags = tagsSplit[1].toLowerCase().replace(/^\s+/g, "").split(/[,;\s]+/);
 	}
