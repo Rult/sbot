@@ -65,11 +65,11 @@ function processMessage(msg) {
 	}
 
 	// обработка сообщения
-	var msgoc = msg.content.replace(/\n/g, " ").replace(/ +/g, " ");
-	var msglc = msgoc.toLowerCase().replace(/ё/g, "е");
-	var msgCommandOriginal;
-	var msgCommand;
-	var msglcDivided;
+	let msgoc = msg.content.replace(/\n/g, " ").replace(/ +/g, " ");
+	let msglc = msgoc.toLowerCase().replace(/ё/g, "е");
+	let msgCommandOriginal;
+	let msgCommand;
+	let msglcDivided;
 
 	// проверка сообщения на наличие команды
 	if (msglcDivided = msglc.match(new RegExp("^(?:сб|сбот|стилл?бот|sb|sbot|still?bot|<@" + botID + ">)" + ",? (.+)$"))) {
@@ -89,20 +89,20 @@ function processMessage(msg) {
 
 	// если всё ок, продолжаем...
 	requestsCounter++;
-	
+
 	// отослать текст запроса в логи
-	var serverWhereUserIs = "Direct Messages";
+	let serverWhereUserIs = "Direct Messages";
 	if (msg.channel.type == "text") {
 		serverWhereUserIs = (msg.channel.guild.name + " (" + msg.channel.guild.id + ")");
 	}
 	console.log((new Date).toLocaleString("ru", dateOptions) + "\nFrom " + serverWhereUserIs + ":\n" + msg.author.id + " | " + msg.author.tag + ": " + msg.content);
 
 	// поделить запрос на "основную команду" и аргументы
-	var args = msgCommand.split(" ");
-	var cmd = args.shift();
+	let args = msgCommand.split(" ");
+	let cmd = args.shift();
 
 	// ищем команду в регулярках
-	for (var i of commandsRegExp) {
+	for (let i of commandsRegExp) {
 		if (cmd.match(i.r)) {
 			i.f(msg, args, msgCommandOriginal);
 			return;
@@ -110,7 +110,7 @@ function processMessage(msg) {
 	}
 
 	// "общение"
-	for (var i of simpleAnswers) {
+	for (let i of simpleAnswers) {
 		if (msgCommand.match(i.r)) {
 			if (i.e) {
 				msg.react(i.e);
@@ -129,7 +129,7 @@ function processMessage(msg) {
 // действия непосредственно после запуска бота
 client.on('ready', () => {
 
-	var readyTimeString = new Date(readyTime).toLocaleString("ru", dateOptions);
+	let readyTimeString = new Date(readyTime).toLocaleString("ru", dateOptions);
 	console.log(client.user.tag + " entered Discord on " + readyTimeString);
 
 	client.user.setPresence({game: {name: "sb help", type: 0}});
@@ -152,9 +152,9 @@ client.on('ready', () => {
 	});
 
 	// кэширование реакций кинотеатра
-	client.channels.get("541594001992581122").fetchMessage("542389154424553549")
+	/*client.channels.get("541594001992581122").fetchMessage("542389154424553549")
 		.then(() => {})
-		.catch(error => console.log(error));
+		.catch(error => console.log(error));*/
 
 });
 client.on('message', msg => {

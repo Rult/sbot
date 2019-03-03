@@ -66,10 +66,10 @@ export function Img(msg, args) {
 		return;
 	}
 
-	var typeOfImage = ".png";
+	let typeOfImage = ".png";
 
-	for (var i = 0; i < args.length; i++) {
-		for (var key in translatedTags) {
+	for (let i = 0; i < args.length; i++) {
+		for (let key in translatedTags) {
 			if (args[i] == "gif") typeOfImage = ".gif";
 
 			if (args[i].match(/^[!]/)) {
@@ -86,18 +86,18 @@ export function Img(msg, args) {
 		}
 	}
 
-	var argsText = "";
+	let argsText = "";
 
 	if (args.length > 0) {
 		argsText = args.join(",");
 		argsText = "?tags=" + encodeURIComponent(argsText);
 	}
 
-	var xhrImg = new XMLHttpRequest();
+	let xhrImg = new XMLHttpRequest();
 	xhrImg.open('GET', 'https://chaoscraft.ml/files/gallery/random/' + argsText);
 	xhrImg.onreadystatechange = function () {
 		if (this.readyState == 4 && this.status == 200) {
-			var imageInfo = JSON.parse(this.responseText);
+			let imageInfo = JSON.parse(this.responseText);
 			if (!imageInfo.error) {
 				msg.channel.send({
 					embed: {
@@ -125,8 +125,8 @@ export function Tags(msg, args) {
 		return;
 	}
 
-	var tags = "Доступные теги:\n\n";
-	for (var key in translatedTags) {
+	let tags = "Доступные теги:\n\n";
+	for (let key in translatedTags) {
 		tags += ("`" + key + "` ");
 	}
 	msg.author.send(tags)
@@ -140,7 +140,7 @@ export function Send(msg, args, msgCommandOriginal, discordLink, imageID, imageD
 	if (!imageID) imageID = "";
 	if (!imageDate) imageDate = "";
 
-	var imageParamsArray = msgCommandOriginal.match(/\S+ (\S+) ([\s\S]+)/);
+	let imageParamsArray = msgCommandOriginal.match(/\S+ (\S+) ([\s\S]+)/);
 
 	if (!imageParamsArray) {
 		msg.react("📜");
@@ -148,25 +148,25 @@ export function Send(msg, args, msgCommandOriginal, discordLink, imageID, imageD
 		return;
 	}
 
-	var imageLink = imageParamsArray[1];
+	let imageLink = imageParamsArray[1];
 
-	var tagsSplit = imageParamsArray[2].split(/(?:tags|т[еаэ]ги):/i, 2);
-	var imageTitle = tagsSplit[0].replace(/\s+$/g, "");
+	let tagsSplit = imageParamsArray[2].split(/(?:tags|т[еаэ]ги):/i, 2);
+	let imageTitle = tagsSplit[0].replace(/\s+$/g, "");
 
-	var imageTags = [];
+	let imageTags = [];
 	if (tagsSplit[1]) {
 		imageTags = tagsSplit[1].toLowerCase().replace(/^\s+/g, "").split(/[,;\s]+/);
 	}
 	imageTags.unshift("screenshot", "minecraft");
-	var imageTagsText = "";
-	for (var i in imageTags) {
+	let imageTagsText = "";
+	for (let i in imageTags) {
 		imageTagsText += '\"' + imageTags[i] + '\", ';
 	}
-	if (imageTagsText) {	
+	if (imageTagsText) {
 		imageTagsText = imageTagsText.slice(0, -2);
 	}
 
-	var imageJSON = '```json\n\t"' + imageID + '": {\n\t\t"title": "' + imageTitle + '",\n\t\t"date": "' + imageDate + '",\n\t\t"takenBy": "' + msg.author.username + '",\n\t\t"big": true,\n\t\t"tags": ['+ imageTagsText +']\n\t},\n```';
+	let imageJSON = '```json\n\t"' + imageID + '": {\n\t\t"title": "' + imageTitle + '",\n\t\t"date": "' + imageDate + '",\n\t\t"takenBy": "' + msg.author.username + '",\n\t\t"big": true,\n\t\t"tags": ['+ imageTagsText +']\n\t},\n```';
 
 	client.channels.get("526441608250392577").send("От " + msg.author.tag + ":\n" + "<" + discordLink + ">\n" + imageLink + "\n" + imageJSON)
 		.then(() => {
@@ -180,8 +180,8 @@ export function React(msg, args) {
 export function EmojiList(msg, args, msgCommandOriginal, usedArrowButton, serverArray) {
 	let fromWhichServer = "343851676404547585";
 	let askedServer = s.getGuild(args[0]);
-	
-	let goRight = false; 
+
+	let goRight = false;
 	let goLeft = false;
 	if (args[0] == "+") {
 		goRight = true;
@@ -206,7 +206,7 @@ export function EmojiList(msg, args, msgCommandOriginal, usedArrowButton, server
 			} else if (n >= serverArray.length) {
 				n = 0;
 			}
-	
+
 			fromWhichServer = serverArray[n];
 		}
 	}
@@ -239,7 +239,7 @@ export function EmojiList(msg, args, msgCommandOriginal, usedArrowButton, server
 			if (++i % 10 == 1) {
 				prefix = "\n" + prefix
 			}
-			let emojiInfo = prefix + key.name + ":" + key.id + postfix; 
+			let emojiInfo = prefix + key.name + ":" + key.id + postfix;
 			emojiList.push(emojiInfo);
 			let emListText = emojiList.join(" ");
 
@@ -297,7 +297,7 @@ export function Sticker(msg, args) {
 		return;
 	}
 
-	var emoji;
+	let emoji;
 
 	if (args[0].match(/^\d+$/g)) {
 		if (client.emojis.get(args[0])) {
@@ -308,10 +308,10 @@ export function Sticker(msg, args) {
 		}
 	}
 
-	var emojiName = s.getEmojiName(args[0]);
+	let emojiName = s.getEmojiName(args[0]);
 
-	var guildName;
-	var guildCheck;
+	let guildName;
+	let guildCheck;
 
 	if (guildCheck = emojiName.match(/^([^:]+)(?::(\S+))$/)) {
 		emojiName = guildCheck[1];
@@ -356,7 +356,7 @@ export function Avatar(msg, args, msgCommandOriginal) {
 		msg.react("🤖");
 		return;
 	}
-	var user;
+	let user;
 	if (args[0]) {
 		user = s.findUserToGetAvatar(s.getSimpleString(msgCommandOriginal.match(/\S+ (.+)/)[1]));
 		if (user) {

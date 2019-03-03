@@ -55,13 +55,13 @@ export function getStorage(emojiName, guildName, channel) {
 				return client.guilds.get(guildName);
 			}
 		}
-		var guildId;
-		var guildIdFull;
+		let guildId;
+		let guildIdFull;
 		client.guilds.forEach(key => {
 			if (guildName == getSimpleString(key.name)) {
 				guildIdFull = key.id;
 			} else if (getSimpleString(key.name).match(new RegExp("^(" + escapeRegExp(guildName) + ")"))) {
-				var currentGuildId = key.id;
+				let currentGuildId = key.id;
 				client.guilds.get(key.id).emojis.forEach(key => {
 					if (key.name.toLowerCase().match(new RegExp("^(" + escapeRegExp(emojiName) + ")"))) {
 						guildId = currentGuildId;
@@ -78,8 +78,8 @@ export function getStorage(emojiName, guildName, channel) {
 	}
 }
 export function findEmoji(emojiName, guildName, channel) {
-	var emoji;
-	var emojiFull;
+	let emoji;
+	let emojiFull;
 
 	if (emojiName.match(/^\d+$/g)) {
 		if (client.emojis.get(emojiName)) {
@@ -88,7 +88,7 @@ export function findEmoji(emojiName, guildName, channel) {
 		}
 	}
 
-	var storage = getStorage(emojiName, guildName, channel);
+	let storage = getStorage(emojiName, guildName, channel);
 
 	if (!storage) {
 		return;
@@ -105,7 +105,7 @@ export function findEmoji(emojiName, guildName, channel) {
 	return (emojiFull) ? emojiFull : emoji;
 }
 export function getEmojiName(emojiText) {
-	var emojiRaw;
+	let emojiRaw;
 	if (emojiRaw = emojiText.match(/(?:<:[^:]+:(\d+)>)/)) {
 		return emojiRaw[1];
 	} else {
@@ -121,20 +121,20 @@ export function findUserToGetAvatar(username) {
 	}
 
 	// проверка на призывалку
-	var usernameId = username.match(/<@\!?(\d+)>/);
+	let usernameId = username.match(/<@\!?(\d+)>/);
 	if (usernameId) {
 		if (client.users.get(usernameId[1])) {
 			return client.users.get(usernameId[1]);
 		}
 	}
 
-	var guildsCounter = 0;
-	var isDisplayNameSuitable = false;
-	var isDisplayNameCanBeSuitable = false;
-	var result;
+	let guildsCounter = 0;
+	let isDisplayNameSuitable = false;
+	let isDisplayNameCanBeSuitable = false;
+	let result;
 
 	client.guilds.forEach(guild => {
-		var usersCounter = 0;
+		let usersCounter = 0;
 		guild.members.forEach(member => {
 			if (member.user.avatar) {
 				if (username == getSimpleString(member.displayName)) {
@@ -167,15 +167,15 @@ export function autoreact(msg, args, isCommandCanBeAnEmoji) {
 		return;
 	};
 
-	var emojiName;
-	var guildName;
-	var messageId = args[1];
+	let emojiName;
+	let guildName;
+	let messageId = args[1];
 
-	var guildCheck;
+	let guildCheck;
 
 	emojiName = getEmojiName(args[0]);
 
-	var emojiError = ["👋", "😶", "🤔", "351002389991653378", "358952906248028160", "357960229259837440", "520641845634531328"];
+	let emojiError = ["👋", "😶", "🤔", "351002389991653378", "358952906248028160", "357960229259837440", "520641845634531328"];
 
 	if (guildCheck = emojiName.match(/^([^:]+)(?::(\S+))$/)) {
 		emojiName = guildCheck[1];
@@ -183,7 +183,7 @@ export function autoreact(msg, args, isCommandCanBeAnEmoji) {
 	}
 
 	if (messageId) {
-		var emoji = findEmoji(emojiName, guildName, msg.channel);
+		let emoji = findEmoji(emojiName, guildName, msg.channel);
 
 		if (!emoji) {
 			if (isCommandCanBeAnEmoji) {
@@ -194,7 +194,7 @@ export function autoreact(msg, args, isCommandCanBeAnEmoji) {
 			return;
 		};
 
-		var wrongChannels = 0;
+		let wrongChannels = 0;
 
 		client.channels.forEach(key => {
 			if (key.type == "text") {
@@ -202,7 +202,7 @@ export function autoreact(msg, args, isCommandCanBeAnEmoji) {
 					.then(messageToReact => {
 						messageToReact.react(emoji);
 						msg.react("⏳");
-						var removeReactionTimeout = setTimeout(() => messageToReact.reactions.get(emoji.name + ":" + emoji.id).remove(client.user), 25000);
+						let removeReactionTimeout = setTimeout(() => messageToReact.reactions.get(emoji.name + ":" + emoji.id).remove(client.user), 25000);
 						messageToReact.awaitReactions((reaction, user) => {
 							if (user.id == msg.author.id && reaction.emoji.id == emoji.id) {
 								messageToReact.reactions.get(emoji.name + ":" + emoji.id).remove(client.user);
@@ -238,7 +238,7 @@ export function autoreact(msg, args, isCommandCanBeAnEmoji) {
 }
 export function deleteUserMessage(msg) {
 	if (msg.channel.type == "text") { // если бот не начал "беседовать" с юзером
-		var bot_permissions = msg.channel.permissionsFor(client.user);
+		let bot_permissions = msg.channel.permissionsFor(client.user);
 		if (bot_permissions.has("MANAGE_MESSAGES")) {
 			msg.delete(10000)
 				.then(() => {})
@@ -254,12 +254,12 @@ export function sendEmojiLinkEmbed(msg, emoji) {
 	}
 }
 export function sendUserAvatarEmbed(msg, user) {
-	var avaTemp = user.avatarURL;
+	let avaTemp = user.avatarURL;
 	// console.log(avaTemp);
-	var avaTempRE = avaTemp.match(/^((?:.*)\.(\w+))/);
+	let avaTempRE = avaTemp.match(/^((?:.*)\.(\w+))/);
 
-	var isAvaGif = (avaTempRE[2] == "gif") ? true : false;
-	var avatarURLFixed = isAvaGif ? avaTemp + "?size=2048" : avaTemp;
+	let isAvaGif = (avaTempRE[2] == "gif") ? true : false;
+	let avatarURLFixed = isAvaGif ? avaTemp + "?size=2048" : avaTemp;
 
 	msg.channel.send({embed: {title: "Avatar", description: user.tag, image: {url: avatarURLFixed}}});
 	// msg.channel.send({embed: {title: "Avatar", description: user.tag, image: {url: avaTemp}}});
@@ -348,8 +348,8 @@ export function dateStr(d) {
 }
 export function checkReactionForAutoreact(messageReaction, user) {
 	if (whoNeedsToReactToSomething[user.id]) {
-		var currentUser = client.users.get(user.id);
-		var currentEmoji = findEmoji(whoNeedsToReactToSomething[user.id], whichGuildThisUserMeans[user.id]);
+		let currentUser = client.users.get(user.id);
+		let currentEmoji = findEmoji(whoNeedsToReactToSomething[user.id], whichGuildThisUserMeans[user.id]);
 
 		messageReaction.message.react(currentEmoji);
 		clearTimeout(timeoutForAutoReact);
@@ -357,7 +357,7 @@ export function checkReactionForAutoreact(messageReaction, user) {
 		delete whoNeedsToReactToSomething[user.id];
 		delete whichGuildThisUserMeans[user.id];
 
-		var timerForDeletingAutoReaction = setTimeout(() => {
+		let timerForDeletingAutoReaction = setTimeout(() => {
 			messageReaction.message.reactions.get(currentEmoji.name + ":" + currentEmoji.id).remove(client.user);
 		}, 25000);
 
