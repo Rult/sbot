@@ -394,13 +394,15 @@ export async function sendAttachmentToImgur(msg, att) {
 		return
 	}
 
-	let imgurData = await got.post("https://api.imgur.com/3/image", {
+    let response = await got.post("https://api.imgur.com/3/image", {
 		headers: {
-			"authorization": `Client-ID ${IMGUR_ID}`
+			"Authorization": `Client-ID ${IMGUR_ID}`
 		},
-		body: att.url,
+		body: {type: "URL", image: att.url},
 		json: true
 	})
+
+	let imgurData = response.body.data
 
 	if (!imgurData.error) {
 		if (msg.content) {
