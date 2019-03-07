@@ -1,7 +1,7 @@
 import * as s from "./secondary"
 import {client, readyTime, OWNER_ID, BOT_ID, requestsCounter} from "./bot"
 
-import { XMLHttpRequest } from "xmlhttprequest"
+import got from 'got'
 import Cheerio from "cheerio"
 import Intl from "intl"
 
@@ -64,7 +64,7 @@ export function Ping(msg) {
 		})
 		.catch(error => console.log(error))
 }
-export function Img(msg, args) {
+export async function Img(msg, args) {
 	// do not spam by pictures
 	if (!s.isThisBotsChannel(msg) && msg.channel.id != "519609441109147655") {
 		msg.react("🤖")
@@ -73,6 +73,7 @@ export function Img(msg, args) {
 
 	let typeOfImage = ".png"
 
+	// TODO: use got.options.query instead
 	for (let i = 0; i < args.length; i++) {
 		for (let key in translatedTags) {
 			if (args[i] == "gif") typeOfImage = ".gif"
@@ -98,32 +99,28 @@ export function Img(msg, args) {
 		argsText = "?tags=" + encodeURIComponent(argsText)
 	}
 
-	let xhrImg = new XMLHttpRequest()
-	xhrImg.open('GET', 'https://chaoscraft.ml/files/gallery/random/' + argsText)
-	xhrImg.onreadystatechange = function () {
-		if (this.readyState == 4 && this.status == 200) {
-			let imageInfo = JSON.parse(this.responseText)
-			if (!imageInfo.error) {
-				msg.channel.send({
-					embed: {
-						color: 0x7486C2,
-						author: {
-							name: imageInfo.title,
-							icon_url: "https://i.imgur.com/5EOhj0z.png",
-							url: ("https://stilltest.tk/gallery/#" + imageInfo.id)
-						},
-						description: ("Теги: " + imageInfo.tags.join(", ") + (imageInfo.date ? "\nДата: " + imageInfo.date : "")),
-						image : {
-							url : ("https://i.imgur.com/" + imageInfo.id + typeOfImage)
-						}
-					}
-				})
-			} else {
-				msg.react("343057042862243840")
+	try {
+		let res = await got(`https://chaoscraft.ml/files/gallery/random/${argsText}`, { json: true })
+		if (res.body.error) throw Error(res.body.error)
+	
+		await msg.channel.send({
+			embed: {
+				color: 0x7486C2,
+				author: {
+					name: imageInfo.title,
+					icon_url: "https://i.imgur.com/5EOhj0z.png",
+					url: `https://stilltest.tk/gallery/#${imageInfo.id}`
+				},
+				description: `Теги: ${imageInfo.tags.join(", ")}`
+					+ imageInfo.date ? `\nДата: ${imageInfo.date}` : "",
+				image: {
+					url: `https://i.imgur.com/${imageInfo.id}${typeOfImage}`
+				}
 			}
-		}
+		})
+	} catch {
+		await msg.react("343057042862243840")
 	}
-	xhrImg.send(null)
 }
 export function Tags(msg, args) {
 	if (args[0]) {
@@ -431,7 +428,7 @@ export function Homestuck(msg, args, msgCommandOriginal, usedArrowButton) {
 	}
 
 	let page_link = 'https://www.homestuck.com/story/' + page_number
-  let comic_title_empty = "hs#" + page_number
+  let comic_number = "hs#" + page_number
   let got_error_already = false
 	let embed_color = 0x249E28
 
@@ -439,116 +436,113 @@ export function Homestuck(msg, args, msgCommandOriginal, usedArrowButton) {
 		color: embed_color,
 		author: {
 			url: page_link,
-			name: comic_title_empty
+			name: comic_number
 		}
 	}
 
-  let xhrHS = new XMLHttpRequest()
-  xhrHS.open('GET', page_link)
-  xhrHS.setRequestHeader("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0")
+	try {
+		let hs = await got(page_link, {
+			headers: {
+				"user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:62.0) Gecko/20100101 Firefox/62.0"
+			}
+		})
 
-  xhrHS.onreadystatechange = function () {
-    if (this.readyState == 4 && this.status == 200) {
-      let $ = Cheerio.load(this.responseText)
+		let $ = Cheerio.load(hs.body)
 
-      let content_container = $('div#content_container')
-      let flash_div = $('div#o_flash-container')
+		let content_container = $('div#content_container')
+		let flash_div = $('div#o_flash-container')
 
+		// detecting video
+		let is_there_video = false
+		let yt_link = ""
+		let yt_link_code
 
-      // detecting video
-      let is_there_video = false
-      let yt_link = ""
-      let yt_link_code
-
-      if (flash_div.length) {
-        let yt_raw = flash_div.html().match(/\'youtubeid\', \'(.+)\'/)
-        if (yt_raw) {
-          yt_link_code = yt_raw[1]
-        }
-      } else {
-        let yt_raw = $('iframe.ar-inner').attr('src')
-        if (yt_raw) {
-          yt_link_code = yt_raw.match(/embed\/(.+)/)[1]
-        }
-      }
-      if (yt_link_code) {
-        yt_link = "https://youtu.be/" + yt_link_code
-        is_there_video = true
-      }
+		if (flash_div.length) {
+			let yt_raw = flash_div.html().match(/\'youtubeid\', \'(.+)\'/)
+			if (yt_raw) {
+				yt_link_code = yt_raw[1]
+			}
+		} else {
+			let yt_raw = $('iframe.ar-inner').attr('src')
+			if (yt_raw) {
+				yt_link_code = yt_raw.match(/embed\/(.+)/)[1]
+			}
+		}
+		if (yt_link_code) {
+			yt_link = `https://youtu.be/${yt_link_code}`
+			is_there_video = true
+		}
 
 
-      if (is_there_video) {
-        // send title, desc and video link
-        s.showHomestuckPage(msg, {}, usedArrowButton, comic_title_empty + "\n" + yt_link)
-      } else {
+		if (is_there_video) {
+			// send title, desc and video link
+			s.showHomestuckPage(msg, {}, usedArrowButton, comic_number + "\n" + yt_link)
+		} else {
+			// getting title
+			let comic_title = $('h2.type-hs-header').text()
+			if (comic_title && !is_there_video) {
+				comic_title = `${comic_title} (${comic_number})`
+			} else {
+				comic_title = comic_number
+			}
+			comic_embed.author.name = comic_title
 
-				// getting title
-	      let comic_title = $('h2.type-hs-header').text()
-	      if (comic_title && !is_there_video) {
-	        comic_title = comic_title + " (hs#" + page_number + ")"
-	      } else {
-	        comic_title = comic_title_empty
-	      }
-				comic_embed.author.name = comic_title
+			// getting description
+			let desc = $('p.type-rg').text().replace(/\ +/g, " ").replace(/^\s+/, "").replace(/\s+$/, "")
+			let desc_limit = 2047
+			if (desc.length > desc_limit) {
+				desc = desc.substring(0, desc_limit) + "…"
+			} else if (desc.length == 0) {
+				desc = ""
+			}
+			comic_embed.description = desc
 
-	      // getting description
-	      let desc = $('p.type-rg').text().replace(/\ +/g, " ").replace(/^\s+/, "").replace(/\s+$/, "")
-	      let desc_limit = 2047
-	      if (desc.length > desc_limit) {
-	        desc = desc.substring(0, desc_limit) + "…"
-	      } else if (desc.length == 0) {
-	        desc = ""
-	      }
-				comic_embed.description = desc
+			// getting images
+			let imgs
+			let img_link = ""
+			let is_img_from_flash = false
+			if (content_container.length) {
+				imgs = content_container.find('img.mar-x-auto.disp-bl')
+				if (!imgs.length) {
+					let imgs_raw = $('div.bg-scratch-mid-green.pad-t-lg').find('img')
+					if (imgs_raw.length) {
+						imgs = imgs_raw.attr('src')
+						is_img_from_flash = true
+					}
+				}
+			} else {
+				imgs = $('img.mar-x-auto.disp-bl')
+			}
+			if (flash_div.length && !imgs.length) {
+				let imgs_raw = flash_div.html().match(/\'altimgsrc\', \'(.+)\'/)
+				if (imgs_raw) {
+					imgs = imgs_raw[1]
+					is_img_from_flash = true
+				}
+			}
+			if (imgs.length) {
+				// send title, image and desc
+				if (is_img_from_flash) {
+					img_link = `https://www.homestuck.com${imgs}`
+				} else if (imgs.attr('src').startsWith("/")) {
+					img_link = `https://www.homestuck.com${imgs.attr('src')}`
+				} else {
+					img_link = imgs.attr('src')
+				}
 
-        // getting images
-        let imgs
-        let img_link = ""
-        let is_img_from_flash = false
-        if (content_container.length) {
-          imgs = content_container.find('img.mar-x-auto.disp-bl')
-          if (!imgs.length) {
-            let imgs_raw = $('div.bg-scratch-mid-green.pad-t-lg').find('img')
-            if (imgs_raw.length) {
-              imgs = imgs_raw.attr('src')
-              is_img_from_flash = true
-            }
-          }
-        } else {
-          imgs = $('img.mar-x-auto.disp-bl')
-        }
-        if (flash_div.length && !imgs.length) {
-          let imgs_raw = flash_div.html().match(/\'altimgsrc\', \'(.+)\'/)
-          if (imgs_raw) {
-            imgs = imgs_raw[1]
-            is_img_from_flash = true
-          }
-        }
-        if (imgs.length) {
-          // send title, image and desc
-          if (is_img_from_flash) {
-            img_link = "https://www.homestuck.com" + imgs
-					} else if (imgs.attr('src').startsWith("/")) {
-						img_link = "https://www.homestuck.com" + imgs.attr('src')
-          } else {
-            img_link = imgs.attr('src')
-          }
-
-					comic_embed.image = {url: img_link}
-        } else {
-          // send title and footer
-					comic_embed.footer = {text: "It's probably interactive."}
-        }
-				s.showHomestuckPage(msg, comic_embed, usedArrowButton, "")
-      }
-    } else if (this.status == 404 && !got_error_already) {
-      // send title and footer
-      got_error_already = true
+				comic_embed.image = {url: img_link}
+			} else {
+				// send title and footer
+				comic_embed.footer = {text: "It's probably interactive."}
+			}
+			s.showHomestuckPage(msg, comic_embed, usedArrowButton, "")
+		}
+	} catch (err) {
+		if (err.statusCode === 404) {
 			comic_embed.footer = {text: "It's probably missing page."}
 			s.showHomestuckPage(msg, comic_embed, usedArrowButton, "")
-    }
-  }
-  xhrHS.send(null)
+		}
+	}
 }
 export function CinemaPing(msg) {
 	if (![OWNER_ID, "184388744558673920", "378318866524143627", "178833086530846720"].includes(msg.author.id)) {
