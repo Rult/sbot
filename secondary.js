@@ -386,7 +386,7 @@ export function checkEmojiListReaction(msgReaction, user, msg, visibleServers) {
 		c.EmojiList(msg, [turn], false, true, visibleServers)
 	}
 }
-export function sendAttachmentToImgur(msg, att) {
+export async function sendAttachmentToImgur(msg, att) {
 	const IMGUR_ID = process.env.IMGUR_ID
 
 	if (!IMGUR_ID) {

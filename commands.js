@@ -100,8 +100,8 @@ export async function Img(msg, args) {
 	}
 
 	try {
-		let res = await got(`https://chaoscraft.ml/files/gallery/random/${argsText}`, { json: true })
-		if (res.body.error) throw Error(res.body.error)
+		let { body: imageInfo } = await got(`https://chaoscraft.ml/files/gallery/random/${argsText}`, { json: true })
+		if (imageInfo.error) throw Error(imageInfo.body.error)
 	
 		await msg.channel.send({
 			embed: {
@@ -112,13 +112,14 @@ export async function Img(msg, args) {
 					url: `https://stilltest.tk/gallery/#${imageInfo.id}`
 				},
 				description: `Теги: ${imageInfo.tags.join(", ")}`
-					+ imageInfo.date ? `\nДата: ${imageInfo.date}` : "",
+					+ (imageInfo.date ? `\nДата: ${imageInfo.date}` : ""),
 				image: {
 					url: `https://i.imgur.com/${imageInfo.id}${typeOfImage}`
 				}
 			}
 		})
-	} catch {
+	} catch (err) {
+		console.log(err)
 		await msg.react("343057042862243840")
 	}
 }
@@ -409,7 +410,7 @@ export function Uptime(msg) {
 
 	msg.channel.send("Я работаю уже " + sarr.join(', ') + '.')
 }
-export function Homestuck(msg, args, msgCommandOriginal, usedArrowButton) {
+export async function Homestuck(msg, args, msgCommandOriginal, usedArrowButton) {
 	if (!s.isThisBotsChannel(msg)) {
 		msg.react("🤖")
 		return
