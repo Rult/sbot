@@ -371,8 +371,8 @@ export const commands = {
 				return false
 			}
 		
-			let fullSizeLink = user.avatarURL.split("?size=")[0] + "?size=2048"
-			let link = user.avatarURL.split("?size=")[0] + "?size=128"
+			let fullSizeLink = user.avatarURL().split("?size=")[0] + "?size=2048"
+			let link = user.avatarURL().split("?size=")[0] + "?size=128"
 
 			if (justGetLinks) {
 				return [fullSizeLink, link]
