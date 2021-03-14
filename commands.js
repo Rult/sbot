@@ -40,6 +40,21 @@ export const commands = {
 			msg.channel.send({embed: helpEmbed})
 		}
 	},
+	Ping: {
+		r: /^(пинг|ping)[.!]?$/,
+		v: true,
+		f (msg) {
+			let pongText = "🏓 Понг!"
+			msg.channel.send(pongText)
+				.then((pong) => {
+					let userTime = msg.createdTimestamp / 1000
+					let botTime = pong.createdTimestamp / 1000
+					let pongTime = (botTime - userTime).toFixed(3)
+					pong.edit(`${pongText} ${pongTime} сек`)
+				})
+				.catch(error => console.log(error))
+		}
+	},
 	Destroy: {
 		r: /^(дестрой)[.!]?$/,
 		f (msg) {
