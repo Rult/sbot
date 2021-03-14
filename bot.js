@@ -203,7 +203,7 @@ client.on('ready', () => {
 					let perms = channel.permissionsFor(client.user)
 					if (perms.has(["VIEW_CHANNEL", "READ_MESSAGE_HISTORY", "ADD_REACTIONS", "USE_EXTERNAL_EMOJIS"])) {
 						chCount++
-						channel.fetchMessages({limit: 25})
+						channel.fetchMessages({limit: 15})
 							.then(() => {
 								chCountAsync++
 								if (chCountAsync === chCountTotal) {
