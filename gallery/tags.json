@@ -1,0 +1,8 @@
+{
+	"type": ["art", "photoshop", "screenshot", "map", "gif"],
+	"where": ["web", "minecraft", "rncr", "randomcraft", "castit", "chaoscraft", "likobsk", "zombiesland", "nether", "end", "spawn"],
+	"gamemode": ["hub", "whitelist", "survival", "creative", "skyblock", "skywars", "castlewars", "parkour", "build", "minigames", "hungergames", "bedwars", "kingdoms"],
+	"user": ["getup", "playerchar", "rult", "haivon", "dragon", "kamka", "imody", "laimon", "namiya", "himlin", "rutschi", "munogun", "delwex", "subsub", "cubbins", "columb", "paper", "vasya", "nekobot", "googlecrasher", "iiokep", "silentbronyrain", "3iluminati"],
+	"object": ["creeper", "cake", "sign", "villager", "irondoor", "launcher"],
+	"misc": ["dank", "bug", "rip", "event", "aprilfools", "overview"]
+}

@@ -10,7 +10,13 @@ const Canvas = require('canvas')
 const { Image } = require('canvas')
 
 const imageRegex = /^http.+\.(png|jpe?g|bmp|gif|webp)/i
-const imgDatabaseURL = "https://chaoscraft.ml/files/gallery/"
+//const imgDatabaseURL = "https://chaoscraft.ml/files/gallery/"
+const fs = require('fs')
+const galleryDirname = './gallery/'
+let {filterImages, parseTags} = require(galleryDirname + 'filter-imgs.js')
+let imgList = require(galleryDirname + 'imgs.json')
+let genDelta = 1367 // must be a prime number
+let genPos = Math.floor(Math.random() * genDelta)
 
 export const commands = {
 	Help: {
@@ -72,17 +78,53 @@ export const commands = {
 	Img: {
 		r: /^(пикча|имг|картинк?а|изображение|галерея|img|image|pic(ture)?|gallery)[.!,:]?$/,
 		async f (msg, args) {
-			let argsText = ""
-		
-			if (args.length > 0) {
-				argsText = args.join(",")
-				argsText = "?tags=" + encodeURIComponent(argsText)
+			if (imgList == null) {
+				await msg.react("604015450304806952")
+				console.log("imgs.json is not available")
+				return
 			}
-		
+
+			let qGroups = null
+			let useRandom = false
+			if (args) {
+				try {
+					qGroups = parseTags(args.join(","))
+					
+					if (qGroups) {
+						if (qGroups.map((item) => item.length).reduce((a, b) => a + b, 0) > 16) {
+							await msg.react("604015450304806952")
+							console.log("too many tags")
+						}
+					}
+				} catch(err) {
+					await msg.react("604015450304806952")
+					console.log("invalid expression for tags")
+				}
+			}
+
+			let imageInfo
+			let passedIds = filterImages(imgList, qGroups)
+			if (passedIds.length != 0) {
+				let availableCount = passedIds.length
+				let randomPos = 0
+				if (useRandom) {
+					// pick randomly
+					randomPos = Math.floor(Math.random() * availableCount)
+				} else {
+					// pick every image once without repetition
+					randomPos = genPos % availableCount
+					genPos += genDelta
+				}
+				let randomId = passedIds[randomPos]
+				
+				imageInfo = imgList[randomId]
+				imageInfo.id = randomId
+			} else {
+				await msg.react("604015450304806952")
+				console.log("Таких изображений нет D:")
+			}
+
 			try {
-				let { body: imageInfo } = await got(`${imgDatabaseURL}random/${argsText}`, { json: true })
-				if (imageInfo.error) throw Error(imageInfo.error)
-			
 				let imageExtension = imageInfo.tags.includes("gif") ? "gif" : "png"
 				let imagePreview = `https://i.imgur.com/${imageInfo.id}t.jpg`
 				await s.getMainColorFromImage(imagePreview, color => {
@@ -91,8 +133,7 @@ export const commands = {
 							color: color,
 							author: {
 								name: imageInfo.title,
-								icon_url: "https://i.imgur.com/5EOhj0z.png",
-								url: `https://stilltest.tk/gallery/#${imageInfo.id}`
+								icon_url: "https://i.imgur.com/5EOhj0z.png"
 							},
 							description: `Теги: ${imageInfo.tags.join(", ")}`
 								+ (imageInfo.date ? `\nДата: ${imageInfo.date}` : ""),
