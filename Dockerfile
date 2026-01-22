@@ -1,5 +1,6 @@
 FROM node:12
 WORKDIR /app
+RUN echo "deb http://archive.debian.org/debian stretch main contrib non-free" > /etc/apt/sources.list
 RUN apt-get update && apt-get install -y \
     build-essential \
     g++ \
